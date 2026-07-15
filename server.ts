@@ -3,8 +3,16 @@ import path from "path";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
+import { Agent, setGlobalDispatcher } from "undici";
 
 dotenv.config();
+
+// Configure undici global dispatcher to prevent HeadersTimeoutError on long-running Gemini API requests
+const globalAgent = new Agent({
+  headersTimeout: 150 * 1000, // 2.5 minutes
+  bodyTimeout: 150 * 1000,
+});
+setGlobalDispatcher(globalAgent);
 
 const app = express();
 const PORT = 3000;
@@ -109,8 +117,8 @@ Options to compare: ${JSON.stringify(options)}
 Evaluation Criteria: ${JSON.stringify(finalCriteria)}
 
 Perform a comprehensive decision matrix evaluation:
-1. Generate 3 key pros and 3 key cons for EACH option. Assign an importance weight (1 to 5) for each point. Give a single-sentence detailed explanation and a category tag (e.g., 'Financial', 'Lifestyle', 'Career') for each.
-2. Conduct a strategic SWOT analysis for EACH option (Strengths, Weaknesses, Opportunities, Threats).
+1. Generate 2 to 3 key pros and 2 to 3 key cons for EACH option. Assign an importance weight (1 to 5) for each point. Give a single-sentence detailed explanation and a category tag (e.g., 'Financial', 'Lifestyle', 'Career') for each.
+2. Conduct a strategic SWOT analysis for EACH option (Strengths, Weaknesses, Opportunities, Threats) with 2 items per category.
 3. Score each option on a scale of 1 to 10 for EACH evaluation criterion, providing a concise justification for the score.
 4. Deliver a final "The Tiebreaker" verdict:
    - Name the recommended option (must exactly match one of the options).

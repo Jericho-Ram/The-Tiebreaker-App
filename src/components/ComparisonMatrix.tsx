@@ -7,6 +7,7 @@ interface ComparisonMatrixProps {
   options: string[];
   comparisonScores: OptionScores[];
   criteriaWeights: Record<string, number>;
+  onWeightChange?: (criterion: string, weight: number) => void;
 }
 
 export default function ComparisonMatrix({
@@ -14,6 +15,7 @@ export default function ComparisonMatrix({
   options,
   comparisonScores,
   criteriaWeights,
+  onWeightChange,
 }: ComparisonMatrixProps) {
   const [selectedCell, setSelectedCell] = useState<{
     criterion: string;
@@ -104,10 +106,20 @@ export default function ComparisonMatrix({
                   </td>
 
                   {/* Criterion weight */}
-                  <td className="py-4 px-4 text-center font-mono text-xs">
-                    <span className="inline-flex items-center px-2 py-0.5 bg-slate-100 text-slate-600 font-bold rounded-md">
-                      {weight}x
-                    </span>
+                  <td className="py-4 px-4 text-center">
+                    <select
+                      value={weight}
+                      onChange={(e) => onWeightChange?.(criterion, parseInt(e.target.value))}
+                      className="inline-flex items-center text-center px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 font-extrabold font-mono text-xs rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer transition-colors"
+                      title="Click to adjust priority weight"
+                      id={`matrix-weight-select-${critIdx}`}
+                    >
+                      <option value={1}>1x (Trivial)</option>
+                      <option value={2}>2x (Low)</option>
+                      <option value={3}>3x (Medium)</option>
+                      <option value={4}>4x (High)</option>
+                      <option value={5}>5x (Critical)</option>
+                    </select>
                   </td>
 
                   {/* Options' scores */}
